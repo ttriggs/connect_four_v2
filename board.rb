@@ -1,8 +1,7 @@
 #!/usr/bin/env ruby
 
-
 class Board
-  WINCOUNT = 4  #it's connect four, right?
+  WINCOUNT = 4  # it's connect four, right?
 
   def initialize(game_obj)
 @show_title = <<EOS
@@ -33,24 +32,22 @@ EOS
     @game_obj      = game_obj
     @winner        = 0
     @play_board    = @play_board.split("\n")
-    @writable_rows = [1,3,5,7,9,11]     # <= perhaps auto-find these?
-    @writable_cols = [1,3,5,7,9,11,13]
-    @board_cells    = []
+    @writable_rows = [1, 3, 5, 7, 9, 11]
+    @writable_cols = [1, 3, 5, 7, 9, 11, 13]
+    @board_cells   = []
     @turn_count    = 0
     @message       = ""
 
-    #setup open cells array
+    # setup open cells array
     @writable_rows.each_with_index do |orow, row_i|
       @writable_cols.each_with_index do |ocol, col_i|
-        @board_cells.push([orow,row_i +1,ocol,col_i +1,0])
+        @board_cells.push([orow, row_i + 1, ocol, col_i + 1, 0])
       end
     end
 
-    headers_ar = ['row','row_i','col','col_i','filled']
+    headers_ar   = ['row', 'row_i', 'col', 'col_i', 'filled']
     @cell_header = Hash.new
-    headers_ar.each_with_index {|header,i|
-      @cell_header[header] = i
-    }
+    headers_ar.each_with_index { |header, i| @cell_header[header] = i }
   end
 
   def set_message(message)
@@ -79,80 +76,83 @@ EOS
 
   def display_board
     system "clear"
-    puts @show_title.gsub("X",'\\')
+    puts @show_title.gsub("X", '\\')
     puts @play_board
     puts "turn count: #{@turn_count / 2} \n#{@message}"
   end
 
-
-  def refresh_board_patterns(test_cells=@board_cells)
-    #create arr for filled cell patterns to for winner or AI analysis
-    @board_patterns = [];
-    filled_cells    = [] #used in diagonal goal testing
-    #setup all row arrays ('name',#,string)
-    rowcol_ar = [['row',@writable_rows],['col',@writable_cols]]
-    rowcol_ar.each do |dir,array|
-      array.each_with_index do |posN,i|
-        pattern = test_cells.select {|a| a[@cell_header[dir]] == posN}.collect {
-                                     |a| a[@cell_header['filled']]}
-        @board_patterns.push([pattern,"-#{dir}.#{i + 1}"].join)
-        if dir == 'row'
-          filled_cells.push(pattern)
-        end
-      end
-    end
-    #rotate array to diamond shape find patterns in diagonals
-    right_diag_pats = diagonalize(filled_cells)
-    left_diag_pats  = diagonalize(filled_cells.reverse)
-
-    diag_ar = [['rdiag',right_diag_pats],['ldiag',left_diag_pats]]
-    diag_ar.each do |name,multi_ar|
-      multi_ar.each_with_index do |subar,i|
-        @board_patterns.push([subar,"-#{name}.#{i}"].join)
-      end
-    end
+  def refresh_board_patterns(test_cells = @board_cells)
+    # create arr for filled cell patterns to for winner or AI analysis
+    @board_patterns = []
+    rows_to_board_patterns(test_cells)
+    # rotate array to diamond shape using diag meth to look for win patterns
+    right_diag_pats = diagonalize(@filled_cells)
+    left_diag_pats  = diagonalize(@filled_cells.reverse)
+    diag_to_board_patterns(left_diag_pats, right_diag_pats)
     @board_patterns
   end
 
+  def rows_to_board_patterns(test_cells)
+    @filled_cells    = [] # used in diagonal goal testing
+    rowcol_ar = [['row', @writable_rows], ['col', @writable_cols]]
+    rowcol_ar.each do |dir, array|
+      array.each_with_index do |posN, i|
+        pattern = test_cells.select { |a| a[@cell_header[dir]] == posN }.collect { |a| a[@cell_header['filled']] }
+        @board_patterns.push([pattern, "-#{dir}.#{i + 1}"].join)
+        if dir == 'row'
+          @filled_cells.push(pattern)
+        end
+      end
+    end
+  end
+
   def diagonalize(filled_cells)
-    return filled_cells.transpose.flatten.group_by.with_index { |_,k|
-      k.divmod(filled_cells.size).inject(:+)
-      }.values.select { |a| a if a.length >= WINCOUNT}
+    return filled_cells.transpose.flatten.group_by.with_index { |_, k|
+      k.divmod(filled_cells.size).inject(:+) }.values.select { |a| a if a.length >= WINCOUNT }
+  end
+
+  def diag_to_board_patterns(left_diag_pats, right_diag_pats)
+    diag_ar = [['rdiag', right_diag_pats], ['ldiag', left_diag_pats]]
+    diag_ar.each do |name, multi_ar|
+      multi_ar.each_with_index do |subar, i|
+        @board_patterns.push([subar, "-#{name}.#{i}"].join)
+      end
+    end
   end
 
   def check_for_winner
     return false if @turn_count == 0
-    for player in [1,2]
+    [1, 2].each do |player|
       refresh_board_patterns
       win_pat = "#{player}" * WINCOUNT
       @board_patterns.each do |pattern|
         next unless pattern.include?(win_pat)
         game_over("#{player}    4-in-a-row!: #{pattern}")
       end
-      game_over("Tie") if @board_cells.select {|a| a[@cell_header['filled']] == 0}.empty?
+      game_over("Tie") if @board_cells.select { |a| a[@cell_header['filled']] == 0 }.empty?
     end
     return false
   end
 
-  def next_open_cells(test_cells=@board_cells)
-    @writable_cols.reduce([]) do |open_cells,col|
-      cell = test_cells.select {|a|
+  def next_open_cells(test_cells = @board_cells)
+    @writable_cols.reduce([]) do |open_cells, col|
+      cell = test_cells.select { |a|
         a[@cell_header['col']] == col &&
-        a[@cell_header['filled']] == 0}.max # maxed=lowest open row pos in col
+        a[@cell_header['filled']] == 0 }.max # maxed=lowest open row pos in col
       open_cells << cell if cell
       open_cells
     end
   end
 
-  def open_cell_in_col(col_i,test_cells=@board_cells)
-    next_open_cells(test_cells).select {|ar| ar[@cell_header['col_i']] == col_i}
+  def open_cell_in_col(col_i, test_cells = @board_cells)
+    next_open_cells(test_cells).select { |ar| ar[@cell_header['col_i']] == col_i }
   end
 
-  def drop_piece(col_i,player_num,test_cells=@board_cells,type="gameplay",token="")
-    cell2fill   = open_cell_in_col(col_i,test_cells)[0]
+  def drop_piece(col_i, player_num, test_cells = @board_cells, type = "gameplay", token = "")
+    cell2fill   = open_cell_in_col(col_i, test_cells)[0]
     cell2fill[@cell_header['filled']] = player_num
     if type == "gameplay"
-      c2frow, c2fcol = cell2fill[@cell_header['row']],cell2fill[@cell_header['col']]
+      c2frow, c2fcol = cell2fill[@cell_header['row']], cell2fill[@cell_header['col']]
       @play_board[c2frow][c2fcol] = token
       @message = "[Last turn, Player #{player_num} chose column #{col_i}]"
     end
@@ -161,55 +161,56 @@ EOS
   def pick_col_for_AI(player_obj)
     player_num, token, _, difficulty,@player_col_rank = player_obj.show_info
     opp_player_obj      = opp_player_obj(player_obj)
-    opp_num, opp_token  = opp_player_obj.show_info
+    opp_num, _          = opp_player_obj.show_info
     @player_col_rank  	= col_rank_intersect(next_open_cells)
-    puts "Player #{player_num}: AI is thinking of next move..."; sleep 1
+    puts "Player #{player_num}: AI is thinking of next move..."
+    sleep 1
     if difficulty == 1
-      baby_AI_pick_col(player_num,token)
+      baby_AI_pick_col(player_num, token)
     else
-      harder_AIs_pick_col(player_obj,player_num,opp_num,token,difficulty)
+      harder_AIs_pick_col(player_obj, player_num, opp_num, token, difficulty)
     end
   end
 
   def col_rank_intersect(open_cells)
-    @player_col_rank = @player_col_rank.find_all {|col_i,rank|
-      open_cells.find  {|ar| ar[@cell_header['col_i']] == col_i}}
+    @player_col_rank = @player_col_rank.find_all { |col_i, _|
+      open_cells.find  { |ar| ar[@cell_header['col_i']] == col_i } }
   end
 
-  def baby_AI_pick_col(player_num,token)
+  def baby_AI_pick_col(player_num, token)
     random_col = next_open_cells.sample[@cell_header['col_i']]
-    drop_piece(random_col,player_num,@board_cells,"gameplay",token)
+    drop_piece(random_col, player_num, @board_cells, "gameplay", token)
   end
 
-  def harder_AIs_pick_col(player_obj,player_num,opp_num,token,difficulty)
+  def harder_AIs_pick_col(player_obj, player_num, opp_num, token, difficulty)
     next_open_cells.each do |open_cell|
       col_i = open_cell[@cell_header['col_i']]
-      player_obj.rank_guide.each do |settings,pos_pats,neg_pats|
-        lookahead,pos_amount,neg_amount = settings
-        next if lookahead > difficulty - 1   #skip looking far ahead for lesser AIs
-        rank_col(col_i,player_num,difficulty,pos_pats,pos_amount,opp_num,neg_pats,neg_amount)
+      player_obj.rank_guide.each do |settings, pos_pats, neg_pats|
+        lookahead, pos_amount, neg_amount = settings
+        next if lookahead > difficulty - 1   # skip looking moves ahead for lesser AIs
+        rank_col(col_i, player_num, difficulty, pos_pats, pos_amount, opp_num, neg_pats, neg_amount)
       end
     end
-    best_col = @player_col_rank.max_by{|rank| rank[1].to_i}[0]
-    drop_piece(best_col,player_num,@board_cells,"gameplay",token)
+    best_col = @player_col_rank.max_by { |rank| rank[1].to_i }[0]
+    drop_piece(best_col, player_num, @board_cells, "gameplay", token)
   end
 
-  def rank_col(col_i,player_num,difficulty,pos_pats,pos_amount,opp_num,neg_pats,neg_amount)
-    [[player_num, pos_pats, pos_amount], [opp_num,neg_pats, neg_amount]].each do |pnum, pats, amount|
+  def rank_col(col_i, player_num, difficulty, pos_pats, pos_amount, opp_num, neg_pats, neg_amount)
+    [[player_num, pos_pats, pos_amount], [opp_num, neg_pats, neg_amount]].each do |pnum, pats, amount|
       sim_cells = deep_copy_array(@board_cells)
-      drop_piece(col_i,pnum,sim_cells,"simulate")
+      drop_piece(col_i, pnum, sim_cells, "simulate")
       refresh_board_patterns(sim_cells)
       pats.each do |pat|
         @board_patterns.each do |bp|
-          next if difficulty < 4 && bp.include?("diag") #skip checking diagonals for lesser AIs
-          add_col_rank(col_i,amount) if bp.include?(pat)
+          next if difficulty < 4 && bp.include?("diag") # skip checking diagonals for lesser AIs
+          add_col_rank(col_i, amount) if bp.include?(pat)
         end
       end
     end
   end
 
-  def add_col_rank(column,amount)
-    @player_col_rank.each {|ar| ar[1] += amount if ar[0] == column.to_i}
+  def add_col_rank(column, amount)
+    @player_col_rank.each { |ar| ar[1] += amount if ar[0] == column.to_i }
   end
 
   def game_over(result)

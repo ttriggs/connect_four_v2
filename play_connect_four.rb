@@ -3,14 +3,13 @@ require './game.rb'
 require './board.rb'
 require './player.rb'
 
-
-#gameplay:
+# gameplay:
 game    = Game.new
 board		= Board.new(game)
-player1 = game.set_player_type(1,"o")
-player2 = game.set_player_type(2,"x")
+player1 = game.set_player_type(1, "o")
+player2 = game.set_player_type(2, "x")
 
-game.setup_turn_queue(player1,player2,board)
+game.setup_turn_queue(player1, player2, board)
 
 while board.check_for_winner == false
   board.display_board
