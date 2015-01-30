@@ -4,6 +4,7 @@ class Board
   WINCOUNT = 4  # it's connect four, right?
 
   def initialize(game_obj)
+    #Nice splash screen :D
 @show_title = <<EOS
                                  _      __
   ___ ___  _ __  _ __   ___  ___| |_   / _| ___  _   _ _ __
@@ -39,6 +40,8 @@ EOS
     @message       = ""
 
     # setup open cells array
+    # can you reduce the nested each_with_index's here?
+    # it's a bit confusing to read
     @writable_rows.each_with_index do |orow, row_i|
       @writable_cols.each_with_index do |ocol, col_i|
         @board_cells.push([orow, row_i + 1, ocol, col_i + 1, 0])
@@ -46,10 +49,15 @@ EOS
     end
 
     headers_ar   = ['row', 'row_i', 'col', 'col_i', 'filled']
+    #variable instantiating usually happens in one place for readibility
     @cell_header = Hash.new
     headers_ar.each_with_index { |header, i| @cell_header[header] = i }
   end
 
+  #look into attr_reader, attr_writer and attr_accessor so you don't have
+  # to make your own method for this. Instead you could just call
+  # variable.message to return the message. Same thing for some of the other
+  # methods below.
   def set_message(message)
     @message = message
   end
@@ -95,6 +103,9 @@ EOS
   def rows_to_board_patterns(test_cells)
     @filled_cells    = [] # used in diagonal goal testing
     rowcol_ar = [['row', @writable_rows], ['col', @writable_cols]]
+    #Here you have an .each, .each_with_index and flow control
+    #I would think about how you can break up all this code into
+    #more readable code.
     rowcol_ar.each do |dir, array|
       array.each_with_index do |posN, i|
         pattern = test_cells.select { |a| a[@cell_header[dir]] == posN }.collect { |a| a[@cell_header['filled']] }
@@ -107,12 +118,21 @@ EOS
   end
 
   def diagonalize(filled_cells)
-    return filled_cells.transpose.flatten.group_by.with_index { |_, k|
+    #This is rather difficult to understand what's going on here
+    #The beauty of Ruby is its readability. It is fun to chain
+    #ruby methods one after the other (transpose.flatten.etc.etc)
+    #but what this does, it makes code difficult to understand
+    #It's ok to have a long, readable method rather than a short
+    #one that requires analysis.
+    filled_cells.transpose.flatten.group_by.with_index { |_, k|
       k.divmod(filled_cells.size).inject(:+) }.values.select { |a| a if a.length >= WINCOUNT }
   end
 
   def diag_to_board_patterns(left_diag_pats, right_diag_pats)
     diag_ar = [['rdiag', right_diag_pats], ['ldiag', left_diag_pats]]
+    #Here is a question that you should ask yourself. If you have so many
+    #nested .each / .each_with_index's, do you think you are using the
+    #right data structures?
     diag_ar.each do |name, multi_ar|
       multi_ar.each_with_index do |subar, i|
         @board_patterns.push([subar, "-#{name}.#{i}"].join)
@@ -145,10 +165,13 @@ EOS
   end
 
   def open_cell_in_col(col_i, test_cells = @board_cells)
+    #name your variables something meaningful
+    #I'm not sure what 'ar' is here on its own
     next_open_cells(test_cells).select { |ar| ar[@cell_header['col_i']] == col_i }
   end
 
   def drop_piece(col_i, player_num, test_cells = @board_cells, type = "gameplay", token = "")
+    #cell_to_fill might be a more rubyesque way to name that variable
     cell2fill   = open_cell_in_col(col_i, test_cells)[0]
     cell2fill[@cell_header['filled']] = player_num
     if type == "gameplay"
@@ -183,6 +206,9 @@ EOS
   end
 
   def harder_AIs_pick_col(player_obj, player_num, opp_num, token, difficulty)
+    # in Ruby, in general, if you are commenting your code, it probably
+    # means that you can make the code more readable. Again, with all the
+    # nested iteration here, it is hard to follow
     next_open_cells.each do |open_cell|
       col_i = open_cell[@cell_header['col_i']]
       player_obj.rank_guide.each do |settings, pos_pats, neg_pats|
@@ -196,6 +222,10 @@ EOS
   end
 
   def rank_col(col_i, player_num, difficulty, pos_pats, pos_amount, opp_num, neg_pats, neg_amount)
+    # break out of all these .each's
+    # In your code, you do a lot of method calling other methods
+    # In general, this is bad practice because it makes it hard to
+    # troubleshoot your code
     [[player_num, pos_pats, pos_amount], [opp_num, neg_pats, neg_amount]].each do |pnum, pats, amount|
       sim_cells = deep_copy_array(@board_cells)
       drop_piece(col_i, pnum, sim_cells, "simulate")
