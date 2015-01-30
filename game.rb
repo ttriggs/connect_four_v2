@@ -9,7 +9,7 @@ class Game
     while answer == ""
       answer = gets.chomp.to_i
       if possible_answers.include?(answer)
-        return answer
+        answer
       else
         answer = ""
         puts "Sorry, could you please try that answer again?"
