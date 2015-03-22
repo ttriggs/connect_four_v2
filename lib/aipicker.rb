@@ -32,6 +32,9 @@ class AIPicker
   end
 
   def harder_AIs_pick_col
+    # this method looks too big, figure out a way to break it up into smaller
+    # methods
+
     difficulty = @player.difficulty
     number     = @player.number
     opp_num    = @window.opponent(@player).number
@@ -61,6 +64,7 @@ class AIPicker
   end
 
   def rank_col(col, player_num, difficulty, pos_pats, pos_amount, opp_num, neg_pats, neg_amount)
+    # this method looks too big too. Figure out how to break it up
     [[player_num, pos_pats, pos_amount], [opp_num, neg_pats, neg_amount]].each do |pnum, pats, amount|
       sim_cells = @board_logic.sandbox_board_data
       simulate_fill(col, sim_cells, pnum)

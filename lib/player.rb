@@ -6,5 +6,8 @@ class Player
     @board_logic = board_logic
     @window = window
   end
+
+  # seems like players should probably have more logic/methods 
+  # associated with it
 end
 

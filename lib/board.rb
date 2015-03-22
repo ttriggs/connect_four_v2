@@ -22,6 +22,7 @@ class Board
 
   def initialize_board_data
     cells = []
+
     (0...COL_COUNT).each do |col|
       (0...ROW_COUNT).each do |row|
         cell = Cell.new(col, row, 0, @open_cell)
@@ -29,6 +30,13 @@ class Board
       end
     end
     cells
+    # you can use #each_with_object to refactor this to this:
+    # (0...COL_COUNT).each_with_object([]) do |col, arr|
+    #   (0...ROW_COUNT).each do |row|
+    #     arr << Cell.new(col, row, 0, @open_cell)
+    #   end
+    # end
+    # it will then return the built array for you
   end
 
   def draw

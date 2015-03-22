@@ -41,10 +41,15 @@ class GameWindow < Gosu::Window
   end
 
   def get_player(number, image, difficulty)
+    # This should be changed to not use explicit return statements.
+    # use a normal if statement with if difficult == 1 => human else = AI
     return Human.new(number, image, @board_logic, self)    if difficulty == 1
     return AI.new(number, image, @board_logic, self, difficulty) if difficulty != 1
   end
 
+  # these two methods seem very similar, think about the common interface
+  # and extract them into one method called take_turn that can be called
+  # on a human OR an AI object
   def human_take_turn(player, col)
     success = player.take_turn(col)
     finish_turn if success
@@ -81,10 +86,13 @@ class GameWindow < Gosu::Window
     end
   end
 
+  # the first part of the ternary doesn't need to be in parenthesis
   def finish_turn
     (@board_logic.game_over?) ? @state = :game_over : toggle_turn
   end
 
+  # there might be some way you can use an enum to make this logic
+  # cleaner
   def toggle_turn
     if @state == :player1_turn
       @state = :player2_turn
@@ -100,6 +108,8 @@ class GameWindow < Gosu::Window
     else
       @board.draw
       end_game if @state == :game_over
+      # I would avoid using sleep, maybe create a timer class that 
+      # you can use to create delay logic
       sleep TURN_DELAY
     end
   end
@@ -147,6 +157,8 @@ class GameWindow < Gosu::Window
     true
   end
 
+  # don't wrap your constants in getters they are already
+  # accessible
   def screen_width
     SCREEN_WIDTH
   end
