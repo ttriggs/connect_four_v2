@@ -2,8 +2,10 @@ class AIPicker
   def initialize(player, window, board_logic)
     @player = player
     @window = window
+    @difficulty = player.difficulty
+    @player_number = player.number
     @board_logic = board_logic
-    @board_data = @board_logic.board_data
+    @board_data  = board_logic.board_data
     @board_patterns = [] # used in simulations
   end
 
@@ -12,7 +14,7 @@ class AIPicker
   end
 
   def pick_col_for_AI
-    if @player.difficulty == GameWindow::BABY
+    if @player.difficulty == @window.baby_difficulty
       baby_AI_pick_col
     else
       harder_AIs_pick_col
@@ -32,17 +34,14 @@ class AIPicker
   end
 
   def harder_AIs_pick_col
-    difficulty = @player.difficulty
-    number     = @player.number
-    opp_num    = @window.opponent(@player).number
     next_opens = @board_logic.next_open_cells
     intersect_ranking_with_opens(next_opens)
     next_opens.map do |cell|
       @player.rank_guide.each do |settings, pos_pats, neg_pats|
         lookahead, pos_amount, neg_amount = settings
         # skip looking ahead for lesser AIs
-        next if lookahead > difficulty - 2
-        rank_col(cell.col, number, difficulty, pos_pats, pos_amount, opp_num, neg_pats, neg_amount)
+        next if lookahead > @difficulty - 2
+        rank_col(cell.col, @difficulty, pos_pats, pos_amount, neg_pats, neg_amount)
       end
     end
     best_col = @player.col_rank.max_by { |rank| rank[1].to_i }[0]
@@ -50,25 +49,26 @@ class AIPicker
   end
 
 
-  def simulate_fill(col, cells, number)
+  def simulate_fill(col, cells, pnum)
     opens_in_col = cells.select  { |cell| cell[:col] == col && cell[:owner] == 0 }
     cell = opens_in_col.max_by { |cell| cell[:row] }
-    cell[:owner] = number
+    cell[:owner] = pnum
   end
 
   def update_board_patterns(cells)
     @board_patterns = @board_logic.get_board_patterns(cells)
   end
 
-  def rank_col(col, player_num, difficulty, pos_pats, pos_amount, opp_num, neg_pats, neg_amount)
-    [[player_num, pos_pats, pos_amount], [opp_num, neg_pats, neg_amount]].each do |pnum, pats, amount|
+  def rank_col(col, difficulty, pos_pats, pos_amount, neg_pats, neg_amount)
+    @opponent_number ||= @window.opponent(@player).number
+    [[@player_number, pos_pats, pos_amount], [@opponent_number, neg_pats, neg_amount]].each do |pnum, pats, amount|
       sim_cells = @board_logic.sandbox_board_data
       simulate_fill(col, sim_cells, pnum)
       update_board_patterns(sim_cells)
       pats.each do |pat|
         @board_patterns.each do |pattern|
           # skip checking diagonals for lesser AIs
-          next if difficulty < GameWindow::EXPERT && pattern.include?("diag")
+          next if difficulty < @window.expert_difficulty && pattern.include?("diag")
           add_col_rank(col, amount) if pattern.include?(pat)
         end
       end

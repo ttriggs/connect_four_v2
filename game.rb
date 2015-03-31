@@ -12,14 +12,12 @@ require_relative 'lib/menu'
 require 'gosu'
 
 class GameWindow < Gosu::Window
-  attr_reader :screen_width, :screen_height
+  attr_reader :screen_width, :screen_height, :expert_difficulty, :baby_difficulty
   attr_accessor :state
 
   SCREEN_WIDTH  = 600
   SCREEN_HEIGHT = 550
-  BABY = 2   # difficulty level
-  EXPERT = 5
-  TURN_DELAY = 0.5 # seconds delay
+
   def initialize
     super(SCREEN_WIDTH, SCREEN_HEIGHT, false)
     @background  = Background.new(self)
@@ -33,6 +31,8 @@ class GameWindow < Gosu::Window
     @medium_font = Gosu::Font.new(self, "Futura", SCREEN_HEIGHT / 22)
     @small_font  = Gosu::Font.new(self, "Futura", SCREEN_HEIGHT / 30)
     self.caption= "Connect Four!"
+    @baby_difficulty   = 2
+    @expert_difficulty = 4
   end
 
   def create_player(number, difficulty)
@@ -41,8 +41,11 @@ class GameWindow < Gosu::Window
   end
 
   def get_player(number, image, difficulty)
-    return Human.new(number, image, @board_logic, self)    if difficulty == 1
-    return AI.new(number, image, @board_logic, self, difficulty) if difficulty != 1
+    if difficulty == 1
+      Human.new(number, image, @board_logic, self)
+    else
+      AI.new(number, image, @board_logic, self, difficulty)
+    end
   end
 
   def human_take_turn(player, col)
@@ -82,7 +85,7 @@ class GameWindow < Gosu::Window
   end
 
   def finish_turn
-    (@board_logic.game_over?) ? @state = :game_over : toggle_turn
+    @board_logic.game_over? ? @state = :game_over : toggle_turn
   end
 
   def toggle_turn
@@ -100,7 +103,6 @@ class GameWindow < Gosu::Window
     else
       @board.draw
       end_game if @state == :game_over
-      sleep TURN_DELAY
     end
   end
 
@@ -147,14 +149,6 @@ class GameWindow < Gosu::Window
     true
   end
 
-  def screen_width
-    SCREEN_WIDTH
-  end
-
-  def screen_height
-    SCREEN_HEIGHT
-  end
-
   def draw_text(x, y, text, font, color)
     font.draw(text, x, y, 1, 1, 1, color)
   end
@@ -163,7 +157,7 @@ class GameWindow < Gosu::Window
     player == @player1 ? @player2 : @player1
   end
 
-  def self.deep_copy(array)
+  def deep_copy(array)
     Marshal.load(Marshal.dump(array))
   end
 end

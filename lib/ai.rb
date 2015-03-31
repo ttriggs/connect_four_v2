@@ -7,8 +7,8 @@ class AI < Player
     goal_patterns = [["XXXX"],
                  ["0XXX", "X0XX", "XX0X", "XXX0"],
                  ["00XX", "0X0X", "0XX0", "X0X0", "XX00"]] # to recognize patterns
-    pos_pats       = gen_ai_patterns(GameWindow.deep_copy(goal_patterns), number)
-    neg_pats       = gen_ai_patterns(GameWindow.deep_copy(goal_patterns), opp_player_num)
+    pos_pats       = gen_ai_patterns(@window.deep_copy(goal_patterns), number)
+    neg_pats       = gen_ai_patterns(@window.deep_copy(goal_patterns), opp_player_num)
               # [0]=num moves ahead, [1]=add value(if AI move) [2]=add value(opponent move)
     @rank_guide    = [[1, 1050, 1000], [2, 70, 30], [3, 20, 0]].zip(pos_pats, neg_pats)
     @difficulty    = difficulty
@@ -26,7 +26,7 @@ class AI < Player
   def take_turn
     #reset baseline column rankings for each turn
     @col_rank  = [[0, 10], [1, 21], [2, 30], [3, 40], [4, 31], [5, 20], [6, 11]]
-    add_rank_noise if @difficulty < GameWindow::EXPERT
+    add_rank_noise if @difficulty < @window.expert_difficulty
     @ai_picker.pick_col_for_AI
   end
 
