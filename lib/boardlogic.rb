@@ -38,7 +38,7 @@ class BoardLogic
   end
 
   def diagonalize(row_patterns)
-    return row_patterns.transpose.flatten.group_by.with_index { |_, k|
+    row_patterns.transpose.flatten.group_by.with_index { |_, k|
       k.divmod(row_patterns.size).inject(:+) }.values.select { |a| a if a.length >= WINCOUNT }
   end
 
