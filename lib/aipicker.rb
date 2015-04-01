@@ -29,34 +29,47 @@ class AIPicker
   end
 
   def pick_col_for_AI
-    @col_rank  = [[0, 10], [1, 21], [2, 30], [3, 40], [4, 31], [5, 20], [6, 11]]
-    add_rank_noise unless expert?
+    @open_cells = get_open_cells
     if @difficulty == @window.baby_difficulty
       baby_AI_pick_col
     else
+      resest_column_rankings
       harder_AIs_pick_col
     end
   end
 
-  def baby_AI_pick_col
-    random_col = @board_logic.next_open_cells.sample.col
-    @board_logic.fill_cell(random_col, @player)
+  def resest_column_rankings
+    @col_rank  = [[0, 10], [1, 21], [2, 30], [3, 40], [4, 31], [5, 20], [6, 11]]
+    add_rank_noise unless expert?
+    filter_for_columns_in_play
   end
 
-  def intersect_ranking_with_opens(next_opens)
+  def add_rank_noise
+    @col_rank.each  { |rank| rank[1] += rand(-10..20) }
+  end
+
+  def filter_for_columns_in_play
     @col_rank.keep_if do |col, _|
-      next_opens.any? {|cell| col == cell.col }
+      @open_cells.any? {|cell| col == cell.col }
     end
   end
 
+  def get_open_cells
+    @board_logic.next_open_cells
+  end
+
+  def baby_AI_pick_col
+    random_col = @open_cells.sample.col
+    @board_logic.fill_cell(random_col, @player)
+  end
+
   # get next open cells
+  # intersect rankings with open cells
   #
 
   def harder_AIs_pick_col
-    next_opens = @board_logic.next_open_cells
-    intersect_ranking_with_opens(next_opens)
-    @rank_guide      ||= initialize_rank_guide
-    next_opens.map do |cell|
+    @rank_guide ||= initialize_rank_guide
+    @open_cells.map do |cell|
       @rank_guide.each do |settings, pos_pats, neg_pats|
         lookahead, pos_amount, neg_amount = settings
         # skip looking ahead for lesser AIs
@@ -67,7 +80,6 @@ class AIPicker
     best_col = @col_rank.max_by { |rank| rank[1].to_i }[0]
     @board_logic.fill_cell(best_col, @player)
   end
-
 
   def simulate_fill(col, cells, pnum)
     opens_in_col = cells.select  { |cell| cell[:col] == col && cell[:owner] == 0 }
@@ -96,10 +108,6 @@ class AIPicker
 
   def expert?
     @difficulty == @window.expert_difficulty
-  end
-
-  def add_rank_noise
-    @col_rank.each  { |rank| rank[1] += rand(-10..20) }
   end
 
   def add_col_rank(col, amount)
