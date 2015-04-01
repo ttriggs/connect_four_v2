@@ -11,6 +11,8 @@ require_relative 'lib/human'
 require_relative 'lib/menu'
 require 'gosu'
 
+require 'pry'
+
 class GameWindow < Gosu::Window
   attr_reader :screen_width, :screen_height, :expert_difficulty, :baby_difficulty
   attr_accessor :state
@@ -50,12 +52,12 @@ class GameWindow < Gosu::Window
 
   def human_take_turn(player, col)
     success = player.take_turn(col)
-    finish_turn if success
+    finish_turn if success  # sucess returns image obj
   end
 
   def ai_take_turn(player)
-    player.take_turn
-    finish_turn
+    success = player.take_turn
+    finish_turn if success
   end
 
   def button_down(key)

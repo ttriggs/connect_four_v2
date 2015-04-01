@@ -7,7 +7,7 @@ class AIPicker
     @player_number = player.number
     @board_logic = board_logic
     @board_data  = board_logic.board_data
-    @board_patterns = [] # used in simulations
+    @board_patterns = []  # used in simulations
     @rank_guide = initialize_rank_guide
   end
 
@@ -34,6 +34,9 @@ class AIPicker
   end
 
   def pick_col_for_AI
+    @col_rank  = [[0, 10], [1, 21], [2, 30], [3, 40], [4, 31], [5, 20], [6, 11]]
+    add_rank_noise unless expert?
+
     if @difficulty == @window.baby_difficulty
       baby_AI_pick_col
     else
@@ -48,10 +51,13 @@ class AIPicker
   end
 
   def intersect_ranking_with_opens(next_opens)
-    @player.col_rank.keep_if do |col, _|
+    @col_rank.keep_if do |col, _|
       next_opens.any? {|cell| col == cell.col }
     end
   end
+
+  # get next open cells
+  #
 
   def harder_AIs_pick_col
     next_opens = @board_logic.next_open_cells
@@ -64,7 +70,7 @@ class AIPicker
         rank_col(cell.col, @difficulty, pos_pats, pos_amount, neg_pats, neg_amount)
       end
     end
-    best_col = @player.col_rank.max_by { |rank| rank[1].to_i }[0]
+    best_col = @col_rank.max_by { |rank| rank[1].to_i }[0]
     @board_logic.fill_cell(best_col, @player)
   end
 
@@ -95,8 +101,17 @@ class AIPicker
     end
   end
 
+  def expert?
+    @difficulty == @window.expert_difficulty
+  end
+
+  def add_rank_noise
+    @col_rank.each  { |rank| rank[1] += rand(-10..20) }
+  end
+
+
   def add_col_rank(col, amount)
-    @player.col_rank.each { |ar| ar[1] += amount if ar[0] == col.to_i }
+    @col_rank.each { |ar| ar[1] += amount if ar[0] == col.to_i }
   end
 end
 
