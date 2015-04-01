@@ -12,7 +12,7 @@ require 'gosu'
 require 'pry'
 
 class GameWindow < Gosu::Window
-  attr_reader :screen_width, :screen_height, :expert_difficulty, :baby_difficulty
+  attr_reader :screen_width, :screen_height, :expert_difficulty, :easy_difficulty
   attr_accessor :state
 
   SCREEN_WIDTH  = 600
@@ -32,7 +32,7 @@ class GameWindow < Gosu::Window
     @medium_font = Gosu::Font.new(self, "Futura", SCREEN_HEIGHT / 22)
     @small_font  = Gosu::Font.new(self, "Futura", SCREEN_HEIGHT / 30)
     self.caption= "Connect Four!"
-    @baby_difficulty   = 2
+    @easy_difficulty   = 2
     @expert_difficulty = 4
   end
 

@@ -30,8 +30,8 @@ class AIPicker
 
   def pick_col_for_AI
     @open_cells = get_open_cells
-    if @difficulty == @window.baby_difficulty
-      baby_AI_pick_col
+    if @difficulty == @window.easy_difficulty
+      easy_AI_pick_col
     else
       resest_column_rankings
       harder_AIs_pick_col
@@ -58,7 +58,7 @@ class AIPicker
     @board_logic.next_open_cells
   end
 
-  def baby_AI_pick_col
+  def easy_AI_pick_col
     random_col = @open_cells.sample.col
     @board_logic.fill_cell(random_col, @player)
   end
