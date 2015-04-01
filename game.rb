@@ -131,10 +131,6 @@ class GameWindow < Gosu::Window
   def draw_text(x, y, text, font, color)
     font.draw(text, x, y, 1, 1, 1, color)
   end
-
-  def deep_copy(array)
-    Marshal.load(Marshal.dump(array))
-  end
 end
 
 #BEGIN PLAY:

@@ -14,8 +14,8 @@ class AIPicker
     goal_patterns = [["XXXX"],
                     ["0XXX", "X0XX", "XX0X", "XXX0"],
                     ["00XX", "0X0X", "0XX0", "X0X0", "XX00"]]  # to recognize patterns
-    pos_pats = gen_ai_patterns(@window.deep_copy(goal_patterns), @number)
-    neg_pats = gen_ai_patterns(@window.deep_copy(goal_patterns), opponent_number)
+    pos_pats = gen_ai_patterns(deep_copy(goal_patterns), @number)
+    neg_pats = gen_ai_patterns(deep_copy(goal_patterns), opponent_number)
               # [0]=num moves ahead, [1]=add value(if AI move) [2]=add value(opponent move)
     [[1, 1050, 1000], [2, 100, 70], [3, 20, 0]].zip(pos_pats, neg_pats)
   end
@@ -112,6 +112,10 @@ class AIPicker
 
   def add_col_rank(col, amount)
     @col_rank.each { |ar| ar[1] += amount if ar[0] == col.to_i }
+  end
+
+  def deep_copy(array)
+    Marshal.load(Marshal.dump(array))
   end
 end
 
