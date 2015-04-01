@@ -109,7 +109,6 @@ class AIPicker
     @col_rank.each  { |rank| rank[1] += rand(-10..20) }
   end
 
-
   def add_col_rank(col, amount)
     @col_rank.each { |ar| ar[1] += amount if ar[0] == col.to_i }
   end
