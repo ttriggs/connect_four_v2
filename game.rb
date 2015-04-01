@@ -5,9 +5,7 @@ require_relative 'lib/cell'
 require_relative 'lib/boardlogic'
 require_relative 'lib/boundingbox'
 require_relative 'lib/player'
-require_relative 'lib/ai'
 require_relative 'lib/aipicker'
-require_relative 'lib/human'
 require_relative 'lib/menu'
 require 'gosu'
 
@@ -19,12 +17,13 @@ class GameWindow < Gosu::Window
 
   SCREEN_WIDTH  = 600
   SCREEN_HEIGHT = 550
+  HUMAN = 1
 
   def initialize
     super(SCREEN_WIDTH, SCREEN_HEIGHT, false)
     @background  = Background.new(self)
-    @player1_image = Gosu::Image.new(self, "img/circle_red.png")
-    @player2_image = Gosu::Image.new(self, "img/circle_blue.png")
+    @p1_image    = Gosu::Image.new(self, "img/circle_red.png")
+    @p2_image    = Gosu::Image.new(self, "img/circle_blue.png")
     @board       = Board.new(self)
     @menu        = Menu.new(self, 40, 70, @board)
     @board_logic = BoardLogic.new(self, @board)
@@ -37,27 +36,9 @@ class GameWindow < Gosu::Window
     @expert_difficulty = 4
   end
 
-  def create_player(number, difficulty)
-    @player1 = get_player(1, @player1_image, difficulty) if number == 1
-    @player2 = get_player(2, @player2_image, difficulty) if number == 2
-  end
-
-  def get_player(number, image, difficulty)
-    if difficulty == 1
-      Human.new(number, image, @board_logic, self)
-    else
-      AI.new(number, image, @board_logic, self, difficulty)
-    end
-  end
-
-  def human_take_turn(player, col)
-    success = player.take_turn(col)
-    finish_turn if success  # sucess returns image obj
-  end
-
-  def ai_take_turn(player)
-    success = player.take_turn
-    finish_turn if success
+  def create_players(p1_difficulty, p2_difficulty)
+    @player1 = Player.new(1, p1_difficulty, @p1_image, self, @board_logic)
+    @player2 = Player.new(2, p2_difficulty, @p2_image, self, @board_logic)
   end
 
   def button_down(key)
@@ -66,9 +47,9 @@ class GameWindow < Gosu::Window
       row, col = screen_coord_to_cell(mouse_x, mouse_y)
       if @board.area.click_within?(mouse_x, mouse_y)
         if @state == :player1_turn
-          human_take_turn(@player1, col) if @player1.class == Human
+          @player1.take_turn(col) if @player1.difficulty == HUMAN
         elsif @state == :player2_turn
-          human_take_turn(@player2, col) if @player2.class == Human
+          @player2.take_turn(col) if @player2.difficulty == HUMAN
         end
       end
       if @state == :menu
@@ -110,9 +91,9 @@ class GameWindow < Gosu::Window
 
   def update
     if @state == :player1_turn
-      ai_take_turn(@player1) if @player1.class == AI
+      @player1.take_turn if @player1.difficulty != HUMAN
     elsif @state == :player2_turn
-      ai_take_turn(@player2) if @player2.class == AI
+      @player2.take_turn if @player2.difficulty != HUMAN
     end
   end
 

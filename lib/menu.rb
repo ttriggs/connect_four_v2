@@ -61,8 +61,7 @@ class Menu
     @p1_difficulty = p1_ans if !p1_ans.nil?
     @p2_difficulty = p2_ans if !p2_ans.nil?
     if @playbox.click_within?(x, y)
-      @window.create_player(1, @p1_difficulty)
-      @window.create_player(2, @p2_difficulty)
+      @window.create_players(@p1_difficulty, @p2_difficulty)
       @window.state = :player1_turn
     end
   end
