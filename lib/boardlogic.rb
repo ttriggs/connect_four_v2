@@ -14,9 +14,8 @@ class BoardLogic
   end
 
   def get_board_patterns(cells = sandbox_board_data)
-    board_patterns = []
     row_owners      = get_row_owners(cells)
-    board_patterns += get_row_patterns(cells)
+    board_patterns  = get_row_patterns(cells)
     board_patterns += get_col_patterns(cells)
     board_patterns += get_diagonal_patterns(row_owners)
   end
@@ -44,7 +43,7 @@ class BoardLogic
   end
 
   def get_diagonal_patterns(row_patterns)
-    patterns = join_patterns('rdiag', diagonalize(row_patterns))
+    patterns =  join_patterns('rdiag', diagonalize(row_patterns))
     patterns += join_patterns('ldiag', diagonalize(row_patterns.reverse))
   end
 
