@@ -38,6 +38,15 @@ class AIPicker
     end
   end
 
+  def get_open_cells
+    @board_logic.next_open_cells
+  end
+
+  def easy_AI_pick_col
+    random_col = @open_cells.sample.col
+    @board_logic.fill_cell(random_col, @player)
+  end
+
   def resest_column_rankings
     @col_rank  = [[0, 10], [1, 21], [2, 30], [3, 40], [4, 31], [5, 20], [6, 11]]
     add_rank_noise unless expert?
@@ -52,15 +61,6 @@ class AIPicker
     @col_rank.keep_if do |col, _|
       @open_cells.any? {|cell| col == cell.col }
     end
-  end
-
-  def get_open_cells
-    @board_logic.next_open_cells
-  end
-
-  def easy_AI_pick_col
-    random_col = @open_cells.sample.col
-    @board_logic.fill_cell(random_col, @player)
   end
 
   # get next open cells
