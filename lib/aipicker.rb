@@ -8,7 +8,7 @@ class AIPicker
     @board_logic = board_logic
     @board_data  = board_logic.board_data
     @board_patterns = []  # used in simulations
-    @rank_guide = initialize_rank_guide
+    # @rank_guide = initialize_rank_guide
   end
 
   def initialize_rank_guide
@@ -29,9 +29,9 @@ class AIPicker
     @number == 1 ? 2 : 1
   end
 
-  def opponent
-    @window.opponent(@player)
-  end
+  # def opponent
+  #   @window.(@player)
+  # end
 
   def pick_col_for_AI
     @col_rank  = [[0, 10], [1, 21], [2, 30], [3, 40], [4, 31], [5, 20], [6, 11]]
@@ -45,8 +45,7 @@ class AIPicker
   end
 
   def baby_AI_pick_col
-    random_col = @board_logic.next_open_cells
-    random_col = random_col.sample.col
+    random_col = @board_logic.next_open_cells.sample.col
     @board_logic.fill_cell(random_col, @player)
   end
 
@@ -62,6 +61,7 @@ class AIPicker
   def harder_AIs_pick_col
     next_opens = @board_logic.next_open_cells
     intersect_ranking_with_opens(next_opens)
+    @rank_guide      ||= initialize_rank_guide
     next_opens.map do |cell|
       @rank_guide.each do |settings, pos_pats, neg_pats|
         lookahead, pos_amount, neg_amount = settings
@@ -86,8 +86,7 @@ class AIPicker
   end
 
   def rank_col(col, difficulty, pos_pats, pos_amount, neg_pats, neg_amount)
-    @opponent_number ||= @window.opponent(@player).number
-    [[@player_number, pos_pats, pos_amount], [@opponent_number, neg_pats, neg_amount]].each do |pnum, pats, amount|
+    [[@player_number, pos_pats, pos_amount], [opponent_number, neg_pats, neg_amount]].each do |pnum, pats, amount|
       sim_cells = @board_logic.sandbox_board_data
       simulate_fill(col, sim_cells, pnum)
       update_board_patterns(sim_cells)

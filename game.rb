@@ -21,13 +21,13 @@ class GameWindow < Gosu::Window
 
   def initialize
     super(SCREEN_WIDTH, SCREEN_HEIGHT, false)
-    @background  = Background.new(self)
-    @p1_image    = Gosu::Image.new(self, "img/circle_red.png")
-    @p2_image    = Gosu::Image.new(self, "img/circle_blue.png")
     @board       = Board.new(self)
+    @background  = Background.new(self)
     @menu        = Menu.new(self, 40, 70, @board)
     @board_logic = BoardLogic.new(self, @board)
     @state       = :menu
+    @p1_image    = Gosu::Image.new(self, "img/circle_red.png")
+    @p2_image    = Gosu::Image.new(self, "img/circle_blue.png")
     @big_font    = Gosu::Font.new(self, "Futura", SCREEN_HEIGHT / 8)
     @medium_font = Gosu::Font.new(self, "Futura", SCREEN_HEIGHT / 22)
     @small_font  = Gosu::Font.new(self, "Futura", SCREEN_HEIGHT / 30)
@@ -72,11 +72,7 @@ class GameWindow < Gosu::Window
   end
 
   def toggle_turn
-    if @state == :player1_turn
-      @state = :player2_turn
-    else
-      @state = :player1_turn
-    end
+    @state = ([:player1_turn, :player2_turn] - [@state])[0]
   end
 
   def draw
