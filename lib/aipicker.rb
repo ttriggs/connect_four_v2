@@ -8,7 +8,6 @@ class AIPicker
     @board_logic = board_logic
     @board_data  = board_logic.board_data
     @board_patterns = []  # used in simulations
-    # @rank_guide = initialize_rank_guide
   end
 
   def initialize_rank_guide
@@ -29,14 +28,9 @@ class AIPicker
     @number == 1 ? 2 : 1
   end
 
-  # def opponent
-  #   @window.(@player)
-  # end
-
   def pick_col_for_AI
     @col_rank  = [[0, 10], [1, 21], [2, 30], [3, 40], [4, 31], [5, 20], [6, 11]]
     add_rank_noise unless expert?
-
     if @difficulty == @window.baby_difficulty
       baby_AI_pick_col
     else

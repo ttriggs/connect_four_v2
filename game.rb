@@ -132,10 +132,6 @@ class GameWindow < Gosu::Window
     font.draw(text, x, y, 1, 1, 1, color)
   end
 
-  def opponent(player)
-    player == @player1 ? @player2 : @player1
-  end
-
   def deep_copy(array)
     Marshal.load(Marshal.dump(array))
   end
