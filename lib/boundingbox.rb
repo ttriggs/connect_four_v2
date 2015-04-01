@@ -22,5 +22,4 @@ class BoundingBox
   def draw_option(font, color)
     font.draw(name, left, top, 3, 1, 1, color)
   end
-
 end

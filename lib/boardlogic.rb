@@ -44,16 +44,14 @@ class BoardLogic
   end
 
   def get_diagonal_patterns(row_patterns)
-    patterns = []
-    right_diag_pats = diagonalize(row_patterns)
-    left_diag_pats  = diagonalize(row_patterns.reverse)
-    diag_ar = [['rdiag', right_diag_pats], ['ldiag', left_diag_pats]]
-    diag_ar.each do |name, multi_ar|
-      multi_ar.each_with_index do |subar, i|
-        patterns << [subar, "-#{name}.#{i}"].join
-      end
+    patterns = join_patterns('rdiag', diagonalize(row_patterns))
+    patterns += join_patterns('ldiag', diagonalize(row_patterns.reverse))
+  end
+
+  def join_patterns(name, lines)
+    lines.map.with_index(0) do |line, i|
+      [line, "-#{name}.#{i}"].join
     end
-    patterns
   end
 
   def tie?
