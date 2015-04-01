@@ -1,12 +1,32 @@
 class AIPicker
   def initialize(player, window, board_logic)
     @player = player
+    @number = player.number
     @window = window
     @difficulty = player.difficulty
     @player_number = player.number
     @board_logic = board_logic
     @board_data  = board_logic.board_data
     @board_patterns = [] # used in simulations
+    @rank_guide = initialize_rank_guide
+  end
+
+  def initialize_rank_guide
+    goal_patterns = [["XXXX"],
+                    ["0XXX", "X0XX", "XX0X", "XXX0"],
+                    ["00XX", "0X0X", "0XX0", "X0X0", "XX00"]]  # to recognize patterns
+    pos_pats = gen_ai_patterns(@window.deep_copy(goal_patterns), @number)
+    neg_pats = gen_ai_patterns(@window.deep_copy(goal_patterns), opponent_number)
+              # [0]=num moves ahead, [1]=add value(if AI move) [2]=add value(opponent move)
+    [[1, 1050, 1000], [2, 100, 70], [3, 20, 0]].zip(pos_pats, neg_pats)
+  end
+
+  def gen_ai_patterns(string_patterns, replace_num)
+    string_patterns.each { |x| x.each { |y| y.gsub!(/X/, "#{replace_num}") } }
+  end
+
+  def opponent_number
+    @number == 1 ? 2 : 1
   end
 
   def opponent
@@ -14,7 +34,7 @@ class AIPicker
   end
 
   def pick_col_for_AI
-    if @player.difficulty == @window.baby_difficulty
+    if @difficulty == @window.baby_difficulty
       baby_AI_pick_col
     else
       harder_AIs_pick_col
@@ -37,7 +57,7 @@ class AIPicker
     next_opens = @board_logic.next_open_cells
     intersect_ranking_with_opens(next_opens)
     next_opens.map do |cell|
-      @player.rank_guide.each do |settings, pos_pats, neg_pats|
+      @rank_guide.each do |settings, pos_pats, neg_pats|
         lookahead, pos_amount, neg_amount = settings
         # skip looking ahead for lesser AIs
         next if lookahead > @difficulty - 2
