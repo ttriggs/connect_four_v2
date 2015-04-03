@@ -8,7 +8,7 @@ class BoardLogic
   end
 
   def sandbox_board_data
-    sandbox = @board_data.map do |cell|
+    @board_data.map do |cell|
       { col: cell.col, row: cell.row, owner: cell.owner }
     end
   end
@@ -16,8 +16,8 @@ class BoardLogic
   def get_board_patterns(cells = sandbox_board_data)
     row_owners      = get_row_owners(cells)
     board_patterns  = get_row_patterns(cells)
-    board_patterns += get_col_patterns(cells)
-    board_patterns += get_diagonal_patterns(row_owners)
+    board_patterns.concat(get_col_patterns(cells))
+    board_patterns.concat(get_diagonal_patterns(row_owners))
   end
 
   def get_col_patterns(cells)
@@ -44,7 +44,7 @@ class BoardLogic
 
   def get_diagonal_patterns(row_patterns)
     patterns =  join_patterns('rdiag', diagonalize(row_patterns))
-    patterns += join_patterns('ldiag', diagonalize(row_patterns.reverse))
+    patterns.concat(join_patterns('ldiag', diagonalize(row_patterns.reverse)))
   end
 
   def join_patterns(name, lines)

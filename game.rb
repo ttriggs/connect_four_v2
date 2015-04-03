@@ -9,8 +9,6 @@ require_relative 'lib/aipicker'
 require_relative 'lib/menu'
 require 'gosu'
 
-require 'pry'
-
 class GameWindow < Gosu::Window
   attr_reader :screen_width, :screen_height, :expert_difficulty, :easy_difficulty
   attr_accessor :state
@@ -33,7 +31,7 @@ class GameWindow < Gosu::Window
     @small_font  = Gosu::Font.new(self, "Futura", SCREEN_HEIGHT / 30)
     self.caption= "Connect Four!"
     @easy_difficulty   = 2
-    @expert_difficulty = 4
+    @expert_difficulty = 5
   end
 
   def create_players(p1_difficulty, p2_difficulty)
@@ -58,7 +56,7 @@ class GameWindow < Gosu::Window
     when Gosu::KbEscape
       close
     when Gosu::KbSpace
-      if @state == :game_over
+      if @state == :reset?
         @board = Board.new(self)
         @background = Background.new(self)
         @board_logic = BoardLogic.new(self, @board)
@@ -82,6 +80,7 @@ class GameWindow < Gosu::Window
     else
       @board.draw
       end_game if @state == :game_over
+      reset_game_display if @state == :reset?
     end
   end
 
@@ -95,13 +94,17 @@ class GameWindow < Gosu::Window
 
   def end_game
     if @board_logic.tie?
-      text = "Game Over: Tie!"
+      @result_text = "Game Over: Tie!"
     else
       number = @board_logic.find_winner
-      text = "Player #{number} Wins!"
+      @result_text = "Player #{number} Wins!"
     end
+    @state = :reset?
+  end
+
+  def reset_game_display
     reset_text = "(press space bar to reset game)"
-    draw_centered_text(450, text, @big_font, 0xffffffff)
+    draw_centered_text(450, @result_text, @big_font, 0xffffffff)
     draw_centered_text(520, reset_text, @small_font, Gosu::Color::RED)
   end
 

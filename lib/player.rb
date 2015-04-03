@@ -3,10 +3,11 @@ class Player
   def initialize(number, difficulty, image, window, board_logic)
     @number = number
     @image  = image
+    human = GameWindow::HUMAN
     @difficulty = difficulty
     @board_logic = board_logic
     @window = window
-    @ai_picker = AIPicker.new(self, window, board_logic) if difficulty > 1
+    @ai_picker = AIPicker.new(self, window, board_logic) if difficulty != human
   end
 
   def take_turn(col = "")
