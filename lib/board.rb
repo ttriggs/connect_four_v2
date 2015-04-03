@@ -21,14 +21,11 @@ class Board
   end
 
   def initialize_board_data
-    cells = []
-    (0...COL_COUNT).each do |col|
+    (0...COL_COUNT).each_with_object([]) do |col, array|
       (0...ROW_COUNT).each do |row|
-        cell = Cell.new(col, row, 0, @open_cell)
-        cells << cell
+        array << Cell.new(col, row, 0, @open_cell)
       end
     end
-    cells
   end
 
   def draw
