@@ -75,10 +75,6 @@ class AIPicker
   def fuzzy_include?(board_patterns, search_patterns)
     board_patterns.map do |bp|
       search_patterns.any? do |pattern|
-        if bp.include?(pattern)
-          x = @board_logic.get_board_patterns(@sim_cells).find {|i| i.include?(bp)}
-          puts "pat found: #{pattern} in BP #{x}"
-        end
         bp.include?(pattern)
       end
     end.any?
