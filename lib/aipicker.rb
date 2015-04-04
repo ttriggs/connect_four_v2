@@ -53,10 +53,10 @@ class AIPicker
 
   def simulate_my_and_opponent_move(cell)
     @rank_guide.each do |lookahead_hash|
-      @sim_cells = @board_logic.sandbox_board_data
-      update_col_rank(cell, lookahead_hash, "op")
-      @sim_cells = @board_logic.sandbox_board_data
-      update_col_rank(cell, lookahead_hash, "my")
+      ["op", "my"].each do |type|
+        @sim_cells = @board_logic.sandbox_board_data
+        update_col_rank(cell, lookahead_hash, type)
+      end
     end
   end
 
