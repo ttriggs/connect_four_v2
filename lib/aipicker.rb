@@ -26,24 +26,23 @@ class AIPicker
   def pick_col_for_AI
     @open_cells = get_open_cells
     if @difficulty == @window.easy_difficulty
-      pick_col_for_easy_AI
+      col = pick_col_for_easy_AI
     else
       resest_baseline_rankings
       @op_number  ||= initialize_opponent_number(@my_number)
       @rank_guide ||= initialize_rank_guide
       simulate_and_eval_outcomes_for_open_cells
-      pick_col_for_harder_AIs
+      col = pick_col_for_harder_AIs
     end
+    @board_logic.fill_cell(col, @player)
   end
 
   def pick_col_for_easy_AI
-    random_col = @open_cells.sample.col
-    @board_logic.fill_cell(random_col, @player)
+    @open_cells.sample.col
   end
 
   def pick_col_for_harder_AIs
-    best_col = @col_rank.max_by { |col, rank| rank }[0]
-    @board_logic.fill_cell(best_col, @player)
+    @col_rank.max_by { |col, rank| rank }[0]
   end
 
   def simulate_and_eval_outcomes_for_open_cells
