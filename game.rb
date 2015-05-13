@@ -85,11 +85,19 @@ class GameWindow < Gosu::Window
   end
 
   def update
+    ais_take_turn
+  end
+
+  def ais_take_turn
     if @state == :player1_turn
-      @player1.take_turn if @player1.difficulty != HUMAN
+      @player1.take_turn if is_ai?(@player1)
     elsif @state == :player2_turn
-      @player2.take_turn if @player2.difficulty != HUMAN
+      @player2.take_turn if is_ai?(@player2)
     end
+  end
+
+  def is_ai?(player)
+    player.difficulty != HUMAN
   end
 
   def end_game
