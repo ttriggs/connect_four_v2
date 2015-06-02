@@ -1,12 +1,12 @@
 #!/usr/bin/env ruby
+require_relative 'lib/aipicker'
 require_relative 'lib/background'
 require_relative 'lib/board'
-require_relative 'lib/cell'
 require_relative 'lib/boardlogic'
 require_relative 'lib/boundingbox'
-require_relative 'lib/player'
-require_relative 'lib/aipicker'
+require_relative 'lib/cell'
 require_relative 'lib/menu'
+require_relative 'lib/player'
 require 'gosu'
 
 class GameWindow < Gosu::Window
