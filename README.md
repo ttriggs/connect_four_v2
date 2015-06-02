@@ -3,8 +3,7 @@
 ##About:
 Play against a friend or an AI with 4 difficulty levels. Optionally, you can simulate matches between two AIs. Questions, comments, and collaborations welcome!
 
-![Gosu connect four in ruby](http://i.imgur.com/UE4VamI.gif)
-
+![Gosu connect four in ruby](http://i.imgur.com/CX0pKHp.gif)
 
 ##Screenshots!:
 
