@@ -34,7 +34,7 @@ class AIPicker
       simulate_and_eval_outcomes_for_open_cells
       col = pick_col_for_harder_AIs
     end
-    @board_logic.fill_cell(col, @player)
+    col
   end
 
   def pick_col_for_easy_AI
