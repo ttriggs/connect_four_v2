@@ -9,8 +9,6 @@ require_relative 'lib/menu'
 require_relative 'lib/player'
 require 'gosu'
 
-require 'pry'
-
 class GameWindow < Gosu::Window
   attr_reader :screen_width, :screen_height, :expert_difficulty, :easy_difficulty
   attr_accessor :state
