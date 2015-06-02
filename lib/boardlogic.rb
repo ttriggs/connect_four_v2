@@ -73,20 +73,24 @@ class BoardLogic
     !open_cell_in_col(col).nil?
   end
 
-  def open_cell_in_col(col, cells = @board_data)
-    opens = cells.select { |cell| cell.col == col && cell.owner == 0 }
+  def open_cell_in_col(col)
+    opens = @board_data.select do |cell|
+      cell.col == col &&
+        cell.owner == 0
+    end
     opens.max_by { |cell| cell.row }
   end
 
-  def next_open_cells(cells = @board_data)
+  def next_open_cells
     open_cells = (0...Board::COL_COUNT).map do |col|
-      open_cell_in_col(col, cells)
+      open_cell_in_col(col)
     end
     open_cells.compact
   end
 
-  def fill_cell(col, player, cells = @board_data)
-    cell = open_cell_in_col(col, cells)
+  def fill_cell(col, player)
+    cell = open_cell_in_col(col)
+    # cell.drop_token(player)
     cell.owner = player.number
     cell.image = player.image
   end
