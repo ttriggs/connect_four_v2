@@ -15,4 +15,8 @@ class Cell
   def empty?
     false
   end
+
+  def self.for_animation(cell, owner, image)
+    new(cell.col, cell.row, owner, image)
+  end
 end
