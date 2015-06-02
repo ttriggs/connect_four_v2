@@ -90,8 +90,6 @@ class BoardLogic
 
   def fill_cell(col, player)
     cell = open_cell_in_col(col)
-    # cell.drop_token(player)
-    cell.owner = player.number
-    cell.image = player.image
+    @board.animate_drop_token_for(player, cell)
   end
 end
