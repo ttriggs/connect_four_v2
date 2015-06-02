@@ -11,19 +11,24 @@ class Player
   end
 
   def take_turn(col = "")
-    if difficulty == 1
+    if player_human?
       human_take_turn(col)
     else
-      @ai_picker.pick_col_for_AI
-      @window.finish_turn
+      col = @ai_picker.pick_col_for_AI
+      @board_logic.fill_cell(col, self)
+      # @window.finish_turn
     end
   end
 
   def human_take_turn(col)
     if @board_logic.any_open_in_col?(col)
       @board_logic.fill_cell(col, self)
-      @window.finish_turn
+      # @window.finish_turn
     end
+  end
+
+  def player_human?
+    @difficulty == 1
   end
 end
 
