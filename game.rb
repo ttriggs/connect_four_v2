@@ -9,6 +9,8 @@ require_relative 'lib/menu'
 require_relative 'lib/player'
 require 'gosu'
 
+require 'pry'
+
 class GameWindow < Gosu::Window
   attr_reader :screen_width, :screen_height, :expert_difficulty, :easy_difficulty
   attr_accessor :state
@@ -42,8 +44,8 @@ class GameWindow < Gosu::Window
   def button_down(key)
     case key
     when Gosu::MsLeft
-      row, col = screen_coord_to_cell(mouse_x, mouse_y)
       if @board.area.click_within?(mouse_x, mouse_y)
+        _row, col = screen_coord_to_cell(mouse_x, mouse_y)
         if @state == :player1_turn
           @player1.take_turn(col) if @player1.difficulty == HUMAN
         elsif @state == :player2_turn
@@ -63,14 +65,6 @@ class GameWindow < Gosu::Window
         @state = :menu
       end
     end
-  end
-
-  def finish_turn
-    @board_logic.game_over? ? @state = :game_over : toggle_turn
-  end
-
-  def toggle_turn
-    @state = ([:player1_turn, :player2_turn] - [@state])[0]
   end
 
   def draw
@@ -94,6 +88,14 @@ class GameWindow < Gosu::Window
     elsif @state == :player2_turn
       @player2.take_turn if is_ai?(@player2)
     end
+  end
+
+  def finish_turn
+    @board_logic.game_over? ? @state = :game_over : toggle_turn
+  end
+
+  def toggle_turn
+    @state = ([:player1_turn, :player2_turn] - [@state])[0]
   end
 
   def is_ai?(player)
