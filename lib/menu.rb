@@ -38,17 +38,23 @@ class Menu
   end
 
   def draw
+    draw_background
+    draw_difficulty_boxes
+  end
+
+  def draw_background
     @bg_image.draw(@x, @y, 0)
     @title.draw(77, 80, 0)
-    draw_text(45, 170, "Player1:", @menu_font, @red)
-    draw_text(45, 230, "Player2:", @menu_font, @blue)
     @playbox.draw_option(@big_font, @white)
+  end
 
-    #draw clickable difficulty boxes
+  def draw_difficulty_boxes
+    draw_text(45, 170, "Player1:", @menu_font, @red)
     @p1_option_boxes.each do |box|
       color = selection_to_color(@p1_difficulty, box.number, 1)
       box.draw_option(@menu_font, color)
     end
+    draw_text(45, 230, "Player2:", @menu_font, @blue)
     @p2_option_boxes.each do |box|
       color = selection_to_color(@p2_difficulty, box.number, 2)
       box.draw_option(@menu_font, color)
