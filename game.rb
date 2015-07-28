@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+
 require_relative 'lib/aipicker'
 require_relative 'lib/background'
 require_relative 'lib/board'
@@ -24,8 +25,6 @@ class GameWindow < Gosu::Window
     @menu        = Menu.new(self, 40, 70, @board)
     @board_logic = BoardLogic.new(self, @board)
     @state       = :menu
-    @p1_image    = Gosu::Image.new(self, "img/circle_red.png")
-    @p2_image    = Gosu::Image.new(self, "img/circle_blue.png")
     @big_font    = Gosu::Font.new(self, "Futura", SCREEN_HEIGHT / 8)
     @medium_font = Gosu::Font.new(self, "Futura", SCREEN_HEIGHT / 22)
     @small_font  = Gosu::Font.new(self, "Futura", SCREEN_HEIGHT / 30)
@@ -35,8 +34,8 @@ class GameWindow < Gosu::Window
   end
 
   def create_players(p1_difficulty, p2_difficulty)
-    @player1 = Player.new(1, p1_difficulty, @p1_image, self, @board_logic)
-    @player2 = Player.new(2, p2_difficulty, @p2_image, self, @board_logic)
+    @player1 = Player.new(1, p1_difficulty, self, @board_logic)
+    @player2 = Player.new(2, p2_difficulty, self, @board_logic)
   end
 
   def button_down(key)
