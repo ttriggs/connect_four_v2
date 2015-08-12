@@ -10,7 +10,7 @@ class Player
   end
 
   def take_turn(col = "")
-    if player_human?
+    if human?
       human_take_turn(col)
     else
       col = ai_picker.pick_col_for_AI
@@ -37,7 +37,11 @@ class Player
     end
   end
 
-  def player_human?
+  def human?
     @difficulty == GameWindow::HUMAN
+  end
+
+  def ai?
+    !human
   end
 end
