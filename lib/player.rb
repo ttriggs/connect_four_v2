@@ -42,6 +42,6 @@ class Player
   end
 
   def ai?
-    !human
+    !human?
   end
 end
