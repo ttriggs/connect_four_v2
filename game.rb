@@ -43,11 +43,7 @@ class GameWindow < Gosu::Window
     when Gosu::MsLeft
       if @board.area.click_within?(mouse_x, mouse_y)
         _row, col = screen_coord_to_cell(mouse_x, mouse_y)
-        if @state == :player1_turn
-          @player1.take_turn(col) if @player1.difficulty == HUMAN
-        elsif @state == :player2_turn
-          @player2.take_turn(col) if @player2.difficulty == HUMAN
-        end
+        humans_take_turn(col) if current_player.human?
       end
       if @state == :menu
         @menu.update_selection(mouse_x, mouse_y)
@@ -79,12 +75,16 @@ class GameWindow < Gosu::Window
     ais_take_turn
   end
 
+  def current_player
+    @state == :player1_turn ? @player1 : @player2
+  end
+
+  def humans_take_turn(col)
+    current_player.take_turn(col) if current_player.human?
+  end
+
   def ais_take_turn
-    if @state == :player1_turn
-      @player1.take_turn if is_ai?(@player1)
-    elsif @state == :player2_turn
-      @player2.take_turn if is_ai?(@player2)
-    end
+    current_player.take_turn if current_player.ai?
   end
 
   def finish_turn
