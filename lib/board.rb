@@ -9,7 +9,7 @@ class Board
 
   def initialize(window)
     @window = window
-    @open_cell_image  = Gosu::Image.new(@window, "img/circle_grey.png")
+    @open_cell_image  = Gosu::Image.new("img/circle_grey.png")
     @board_data = initialize_board_data
     @row_count = ROW_COUNT
     @col_count = COL_COUNT
