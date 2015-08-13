@@ -41,17 +41,15 @@ class GameWindow < Gosu::Window
   def button_down(key)
     case key
     when Gosu::MsLeft
-      if @board.area.click_within?(mouse_x, mouse_y)
-        _row, col = screen_coord_to_cell(mouse_x, mouse_y)
-        humans_take_turn(col) if current_player.human?
-      end
-      if @state == :menu
+      if in_menu?
         @menu.update_selection(mouse_x, mouse_y)
+      elsif humans_turn?
+        humans_take_turn(mouse_x, mouse_y)
       end
     when Gosu::KbEscape
       close
     when Gosu::KbSpace
-      if @state == :reset?
+      if game_reset?
         @board = Board.new(self)
         @background = Background.new(self)
         @board_logic = BoardLogic.new(self, @board)
@@ -62,34 +60,54 @@ class GameWindow < Gosu::Window
 
   def draw
     @background.draw
-    if @state == :menu
+    if in_menu?
       @menu.draw
     else
       @board.draw
       end_game if @state == :game_over
-      reset_game_display if @state == :reset?
+      reset_game_display if @state == :reset_menu
     end
   end
 
   def update
-    ais_take_turn if in_gameplay?(state)
+    ais_take_turn if ais_turn?
   end
 
-  def in_gameplay?(state)
-    state.to_s.include?("_turn")
+  def in_gameplay?
+    @state.to_s.include?("_turn")
+  end
+
+  def game_reset?
+    @state == :reset_menu
+  end
+
+  def in_menu?
+    @state == :menu
+  end
+
+  def ais_turn?
+    in_gameplay? && current_player.ai?
+  end
+
+  def humans_turn?
+    in_gameplay? && current_player.human?
   end
 
   def current_player
-    @state == :player1_turn ? @player1 : @player2
+    if @state == :player1_turn
+      @player1
+    elsif @state == :player2_turn
+      @player2
+    end
   end
 
-  def humans_take_turn(col)
-    current_player.take_turn(col) if current_player.human?
+  def humans_take_turn(mouse_x, mouse_y)
+    col = @board.clicked_col(mouse_x, mouse_y)
+    current_player.take_turn(col) if col
   end
 
   def ais_take_turn
-    require 'pry'; binding.pry 
-    current_player.take_turn if current_player.ai?
+    current_player.take_turn
   end
 
   def finish_turn
@@ -100,10 +118,6 @@ class GameWindow < Gosu::Window
     @state = ([:player1_turn, :player2_turn] - [@state])[0]
   end
 
-  def is_ai?(player)
-    player.difficulty != HUMAN
-  end
-
   def end_game
     if @board_logic.tie?
       @result_text = "Game Over: Tie!"
@@ -111,7 +125,7 @@ class GameWindow < Gosu::Window
       number = @board_logic.find_winner
       @result_text = "Player #{number} Wins!"
     end
-    @state = :reset?
+    @state = :reset_menu
   end
 
   def reset_game_display
@@ -120,23 +134,9 @@ class GameWindow < Gosu::Window
     draw_centered_text(520, reset_text, @small_font, Gosu::Color::RED)
   end
 
-  def screen_coord_to_cell(x, y)
-    col = ((x - start_x) / @board.cell_dim).to_i
-    row = ((y - start_y) / @board.cell_dim).to_i
-    [row, col]
-  end
-
   def draw_centered_text(y, text, font, color)
     x = (SCREEN_WIDTH - font.text_width(text)) / 2
     draw_text(x, y, text, font, color)
-  end
-
-  def start_x
-    @board.left_pad
-  end
-
-  def start_y
-    @board.top_pad
   end
 
   def needs_cursor?
