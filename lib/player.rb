@@ -28,7 +28,7 @@ class Player
 
   def game_token(color)
     file = "img/circle_#{color}.png"
-    Gosu::Image.new(@window, file)
+    Gosu::Image.new(file)
   end
 
   def human_take_turn(col)
