@@ -1,5 +1,4 @@
 class Board
-  attr_reader :left_pad, :top_pad, :area, :cell_dim
   attr_accessor :board_data
   ROW_COUNT = 6
   COL_COUNT = 7
@@ -9,23 +8,21 @@ class Board
 
   def initialize(window)
     @window = window
-    @open_cell_image  = Gosu::Image.new("img/circle_grey.png")
     @board_data = initialize_board_data
-    @row_count = ROW_COUNT
-    @col_count = COL_COUNT
-    @cell_dim  = CELL_DIM
-    @left_pad  = LEFT_PAD
-    @top_pad   = TOP_PAD
     @state = :draw_board
-    width  = @col_count * CELL_DIM
-    height = @row_count * CELL_DIM
-    @area  = BoundingBox.new(@left_pad, @top_pad, width, height)
+    width  = COL_COUNT * CELL_DIM
+    height = ROW_COUNT * CELL_DIM
+    @area  = BoundingBox.new(LEFT_PAD, TOP_PAD, width, height)
+  end
+
+  def open_cell_image
+    @open_cell_image ||= Gosu::Image.new("img/circle_grey.png")
   end
 
   def initialize_board_data
     (0...COL_COUNT).each_with_object([]) do |col, array|
       (0...ROW_COUNT).each do |row|
-        array << Cell.new(col, row, 0, @open_cell_image)
+        array << Cell.new(col, row, 0, open_cell_image)
       end
     end
   end
@@ -69,12 +66,22 @@ class Board
     end
   end
 
+  def clicked_col(mouse_x, mouse_y)
+    if @area.click_within?(mouse_x, mouse_y)
+      screen_coord_to_col(mouse_x)
+    end
+  end
+
+  def screen_coord_to_col(x)
+    ((x - LEFT_PAD) / CELL_DIM).to_i
+  end
+
   def cell_x(cell)
-    (cell.col * CELL_DIM) + @left_pad
+    (cell.col * CELL_DIM) + LEFT_PAD
   end
 
   def cell_y(cell)
-    (cell.row * CELL_DIM) + @top_pad
+    (cell.row * CELL_DIM) + TOP_PAD
   end
 end
 
