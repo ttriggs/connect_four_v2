@@ -25,7 +25,7 @@ class AIPicker
 
   def pick_col_for_AI
     @open_cells = get_open_cells
-    if @difficulty == @window.easy_difficulty
+    if @difficulty == GameWindow::EASY
       col = pick_col_for_easy_AI
     else
       resest_baseline_rankings
@@ -128,7 +128,7 @@ class AIPicker
   end
 
   def expert?
-    @difficulty == @window.expert_difficulty
+    @difficulty == GameWindow::EXPERT
   end
 end
 
