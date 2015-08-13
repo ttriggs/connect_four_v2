@@ -72,7 +72,11 @@ class GameWindow < Gosu::Window
   end
 
   def update
-    ais_take_turn
+    ais_take_turn if in_gameplay?(state)
+  end
+
+  def in_gameplay?(state)
+    state.to_s.include?("_turn")
   end
 
   def current_player
@@ -84,6 +88,7 @@ class GameWindow < Gosu::Window
   end
 
   def ais_take_turn
+    require 'pry'; binding.pry 
     current_player.take_turn if current_player.ai?
   end
 
