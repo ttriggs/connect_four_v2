@@ -11,12 +11,13 @@ require_relative 'lib/player'
 require 'gosu'
 
 class GameWindow < Gosu::Window
-  attr_reader :screen_width, :screen_height, :expert_difficulty, :easy_difficulty
   attr_accessor :state
 
   SCREEN_WIDTH  = 600
   SCREEN_HEIGHT = 550
   HUMAN = 1
+  EASY = 2
+  EXPERT = 5
 
   def initialize
     super(SCREEN_WIDTH, SCREEN_HEIGHT, false)
@@ -29,8 +30,6 @@ class GameWindow < Gosu::Window
     @medium_font = Gosu::Font.new(self, "Futura", SCREEN_HEIGHT / 22)
     @small_font  = Gosu::Font.new(self, "Futura", SCREEN_HEIGHT / 30)
     self.caption= "Connect Four!"
-    @easy_difficulty   = 2
-    @expert_difficulty = 5
   end
 
   def create_players(p1_difficulty, p2_difficulty)
