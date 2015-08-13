@@ -6,8 +6,8 @@ class Menu
     @window = window
     @menu_font = Gosu::Font.new(@window, "Futura", @window.height / 15)
     @big_font  = Gosu::Font.new(@window, "Futura", @window.height / 8)
-    @bg_image  = Gosu::Image.new(@window, 'img/menu.png')
-    @title     = Gosu::Image.new(@window, 'img/title.png')
+    @bg_image  = Gosu::Image.new('img/menu.png')
+    @title     = Gosu::Image.new('img/title.png')
     @playbox   = BoundingBox.new(90, 400, 120, 50, "start", "PLAY!")
     @p1_difficulty = 1
     @p2_difficulty = 3
